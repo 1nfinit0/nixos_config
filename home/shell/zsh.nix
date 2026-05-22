@@ -1,6 +1,11 @@
 { config, pkgs, lib, ... }:
 
 {
+	
+	home.sessionVariables = {
+    		MAMBA_ROOT_PREFIX = "$HOME/.local/share/micromamba";
+	};
+
   programs.zsh = {
     enable = true;
 
