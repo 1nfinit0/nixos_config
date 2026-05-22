@@ -8,6 +8,7 @@
 		./apps/rofi/rofi.nix
 		./apps/kitty/kitty.nix
 		./apps/vscode/vscode.nix
+		./apps/latex/latex.nix
 
 		./desktop/hyprland.nix
 
