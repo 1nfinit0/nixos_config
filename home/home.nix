@@ -7,6 +7,7 @@
 		./apps/browser/browser.nix
 		./apps/rofi/rofi.nix
 		./apps/kitty/kitty.nix
+		./apps/vscode/vscode.nix
 
 		./desktop/hyprland.nix
 
