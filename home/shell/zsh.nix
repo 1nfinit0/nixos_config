@@ -87,8 +87,12 @@
 	bindkey "^[[1;5D" backward-word
 	bindkey "^[[1;5C" forward-word
 
-      # modo emacs (como tu setup antiguo)
-      bindkey -e
+        # modo emacs
+        bindkey -e
+
+	#Micromamba
+	eval "$(micromamba shell hook --shell zsh)"
+
     '';
   };
 }
