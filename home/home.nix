@@ -9,6 +9,7 @@
 		./apps/kitty/kitty.nix
 		./apps/vscode/vscode.nix
 		./apps/latex/latex.nix
+		./apps/zoom/zoom.nix
 
 		./desktop/hyprland.nix
 

@@ -7,6 +7,6 @@
 
   home.packages = with pkgs; [
     swayosd
-    brightnessctl   # control de brillo
+    brightnessctl
   ];
 }

@@ -28,5 +28,6 @@
     cliphist
     wl-clipboard
     unzip
+    vim
   ];
 }
