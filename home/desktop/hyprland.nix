@@ -8,11 +8,11 @@
       input = {
         kb_layout = "latam";
       };
-	
-    exec-once = [
-      "waybar"
-    ];
 
+    # exec-once = [
+    #   "waybar"
+    # ];
+    
     };
   };
   imports = [

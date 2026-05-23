@@ -7,7 +7,8 @@
     "SUPER, D, exec, rofi -show drun"
 
     # waybar
-    "SUPER, B, exec, pkill waybar || waybar"
+    # binds.nix — reemplaza tu bind actual de waybar
+    "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '4,0,0,0'; fi"
 
     # cerrar ventana activa
     "SUPER, Q, killactive"
