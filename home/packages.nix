@@ -4,9 +4,8 @@
   home.packages = with pkgs; [
 
     # -----------------------------
-    # TERMINAL / SHELL 
+    # TERMINAL / SHELL
     # -----------------------------
-    kitty
     fastfetch
     eza
     bat
@@ -25,7 +24,7 @@
     # -----------------------------
     # DEVELOPMENT / CLI TOOLS
     # -----------------------------
-    git
+    wl-clipboard
     unzip
   ];
 }

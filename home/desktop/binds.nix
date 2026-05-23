@@ -7,8 +7,16 @@
     "SUPER, D, exec, rofi -show drun"
 
     # waybar
-    # binds.nix — reemplaza tu bind actual de waybar
     "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '4,0,0,0'; fi"
+
+    # Volumen
+    ", XF86AudioMute,        exec, swayosd-client --output-volume mute-toggle"
+    ", XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
+    ", XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
+
+    # Brillo
+    ", XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
+    ", XF86MonBrightnessUp,   exec, swayosd-client --brightness raise"
 
     # cerrar ventana activa
     "SUPER, Q, killactive"
@@ -25,7 +33,7 @@
     "SUPER, 3, workspace, 3"
     "SUPER, 4, workspace, 4"
 
-    # mover ventana a workspace (SHIFT + SUPER + número)
+    # mover ventana a workspace
     "SUPER SHIFT, 1, movetoworkspace, 1"
     "SUPER SHIFT, 2, movetoworkspace, 2"
     "SUPER SHIFT, 3, movetoworkspace, 3"
