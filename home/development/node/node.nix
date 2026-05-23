@@ -2,16 +2,16 @@
 {
   home.packages = with pkgs; [
     nodejs
-    nodePackages.typescript
-    nodePackages.typescript-language-server
-    nodePackages.pnpm
+    typescript
+    typescript-language-server
+    pnpm
   ];
 
   home.sessionVariables = {
-    NODE_PATH = "$HOME/.npm-global/lib/node_modules";
+    PNPM_HOME = "$HOME/.local/share/pnpm";
   };
 
   home.sessionPath = [
-    "$HOME/.npm-global/bin"
+    "$HOME/.local/share/pnpm"
   ];
 }

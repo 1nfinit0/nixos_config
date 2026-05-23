@@ -23,8 +23,8 @@
   ];
 
 	home.sessionVariables = {
-  CLIPHIST_MAX_ITEMS = "50";
-  };
+	  CLIPHIST_MAX_ITEMS = "50";
+  	};
 
   home.stateVersion = "25.11";
 }
