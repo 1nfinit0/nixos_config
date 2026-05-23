@@ -33,6 +33,7 @@
     "SUPER, right, movefocus, r"
     "SUPER, up, movefocus, u"
     "SUPER, down, movefocus, d"
+    "ALT, Tab, cyclenext"
 
     # workspaces (1–4)
     "SUPER, 1, workspace, 1"
@@ -53,9 +54,9 @@
     "SUPER SHIFT, down, swapwindow, d"
 
     # resize de ventanas (CTRL + SUPER + flechas)
-    "SUPER CTRL, left, resizeactive, -20 0"
-    "SUPER CTRL, right, resizeactive, 20 0"
-    "SUPER CTRL, up, resizeactive, 0 -20"
-    "SUPER CTRL, down, resizeactive, 0 20"
+    "SUPER CTRL, left, resizeactive, -40 0"
+    "SUPER CTRL, right, resizeactive, 40 0"
+    "SUPER CTRL, up, resizeactive, 0 -40"
+    "SUPER CTRL, down, resizeactive, 0 40"
   ];
 }

@@ -36,7 +36,7 @@
       la = "eza -lah --icons --sort=modified";
       lt = "eza --tree";
 
-      cat = "bat";
+      cat = "bat --plain";
       grep = "rg";
       icat = "kitty +kitten icat";
 
