@@ -14,6 +14,7 @@
   ];
 
   networking.hostName = "nixos";
+  security.pam.services.login.enableGnomeKeyring = true;
 
 	services.postgresql = {
   		enable = true;

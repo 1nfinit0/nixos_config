@@ -5,6 +5,7 @@
     # apps básicas
     "SUPER, RETURN, exec, kitty"
     "SUPER, D, exec, rofi -show drun"
+    "SUPER SHIFT, W, exec, brave"
 
     # waybar
     "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '2,0,0,0'; fi"
