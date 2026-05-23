@@ -7,7 +7,7 @@
     "SUPER, D, exec, rofi -show drun"
 
     # waybar
-    "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '4,0,0,0'; fi"
+    "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '2,0,0,0'; fi"
 
     # Volumen
     ", XF86AudioMute,        exec, swayosd-client --output-volume mute-toggle"
