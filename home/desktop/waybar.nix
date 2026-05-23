@@ -11,18 +11,16 @@
         height = 30;
 
         modules-left = [
-          "hyprland/workspaces"
+          "clock"
         ];
 
         modules-center = [
-          "clock"
+          "hyprland/workspaces"
         ];
 
         modules-right = [
           "network"
           "battery"
-          "pulseaudio"
-          "tray"
         ];
 
         "hyprland/workspaces" = {
@@ -36,15 +34,15 @@
         };
 
         network = {
-          format-wifi = "  {essid}";
-          format-ethernet = "󰈀 Ethernet";
-          format-disconnected = "󰖪 Offline";
+          format-wifi = "";
+          format-ethernet = "";
+          format-disconnected = "󰖪";
           tooltip = true;
         };
 
         battery = {
-          format = "{capacity}% {icon}";
-          format-charging = "󰂄 {capacity}%";
+          format = "{icon}";
+          format-charging = "󰂄";
           format-icons = [
             "󰁺"
             "󰁻"
@@ -62,10 +60,6 @@
         pulseaudio = {
           format = "{volume}% ";
           format-muted = "󰖁";
-        };
-
-        tray = {
-          spacing = 10;
         };
       };
     };
