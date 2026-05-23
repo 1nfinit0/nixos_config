@@ -8,6 +8,11 @@
 	"col.active_border" = "rgba(88888888)";
 	"col.inactive_border" = "rgba(44444444)";
     };
+
+    cursor = {
+      inactive_timeout = 2;
+    };
+
     decoration = {
       rounding = 6;
       blur = {

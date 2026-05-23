@@ -10,7 +10,7 @@
       };
 
     # exec-once = [
-    #   "waybar"
+    #   # "waybar"
     # ];
 
     };
