@@ -4,6 +4,7 @@
 		./development/git/git.nix
 		./development/python/python.nix
 		./development/java/java.nix
+		./development/netbeans/netbeans.nix
 
 		./apps/browser/browser.nix
 		./apps/rofi/rofi.nix
