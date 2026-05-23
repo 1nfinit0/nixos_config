@@ -24,6 +24,8 @@
     # -----------------------------
     # DEVELOPMENT / CLI TOOLS
     # -----------------------------
+    grimblast
+    cliphist
     wl-clipboard
     unzip
   ];

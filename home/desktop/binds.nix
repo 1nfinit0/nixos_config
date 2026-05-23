@@ -9,14 +9,20 @@
     # waybar
     "SUPER, B, exec, if pgrep waybar; then pkill waybar && hyprctl keyword general:gaps_out 0; else waybar & hyprctl keyword general:gaps_out '2,0,0,0'; fi"
 
-    # Volumen
+    # Volumen osd
     ", XF86AudioMute,        exec, swayosd-client --output-volume mute-toggle"
     ", XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
     ", XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
 
-    # Brillo
+    # Brillo osd
     ", XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
     ", XF86MonBrightnessUp,   exec, swayosd-client --brightness raise"
+
+    # grimblast - Screenshot
+    ", Print, exec, grimblast copy screen"
+    "SUPER SHIFT, S, exec, grimblast copy area"
+    # cliphist - Clipboard manager
+    "SUPER, V, exec, cliphist list | rofi -dmenu -p 'Clipboard' | cliphist decode | wl-copy"
 
     # cerrar ventana activa
     "SUPER, Q, killactive"

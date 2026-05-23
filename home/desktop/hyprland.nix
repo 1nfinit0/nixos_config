@@ -9,9 +9,10 @@
         kb_layout = "latam";
       };
 
-    # exec-once = [
-    #   # "waybar"
-    # ];
+    exec-once = [
+      # "waybar"
+      "wl-paste --watch cliphist store"
+    ];
 
     };
   };
