@@ -8,11 +8,17 @@
       input = {
         kb_layout = "latam";
       };
+	
+    exec-once = [
+      "waybar"
+    ];
+
     };
   };
   imports = [
     ./binds.nix
     ./look.nix
+    ./waybar.nix
     ./monitor.nix
     ./wallpaper.nix
   ];

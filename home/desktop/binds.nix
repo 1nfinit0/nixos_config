@@ -6,6 +6,9 @@
     "SUPER, RETURN, exec, kitty"
     "SUPER, D, exec, rofi -show drun"
 
+    # waybar
+    "SUPER, B, exec, killall -SIGUSR1 waybar"
+
     # cerrar ventana activa
     "SUPER, Q, killactive"
 
