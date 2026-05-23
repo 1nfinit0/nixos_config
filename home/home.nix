@@ -6,6 +6,7 @@
 		./development/java/java.nix
 		./development/netbeans/netbeans.nix
 		./development/pgadmin/pgadmin.nix
+		./development/node/node.nix
 
 		./apps/browser/browser.nix
 		./apps/rofi/rofi.nix
