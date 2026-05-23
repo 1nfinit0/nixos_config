@@ -5,6 +5,7 @@
 		./development/python/python.nix
 		./development/java/java.nix
 		./development/netbeans/netbeans.nix
+		./development/pgadmin/pgadmin.nix
 
 		./apps/browser/browser.nix
 		./apps/rofi/rofi.nix
