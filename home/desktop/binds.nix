@@ -7,7 +7,7 @@
     "SUPER, D, exec, rofi -show drun"
 
     # waybar
-    "SUPER, B, exec, killall -SIGUSR1 waybar"
+    "SUPER, B, exec, pkill waybar || waybar"
 
     # cerrar ventana activa
     "SUPER, Q, killactive"
