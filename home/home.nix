@@ -13,6 +13,7 @@
 		./apps/kitty/kitty.nix
 		./apps/vscode/vscode.nix
 		./apps/latex/latex.nix
+		./apps/wine/wine.nix
 
 		./desktop/hyprland.nix
 
