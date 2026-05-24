@@ -29,6 +29,5 @@
     wl-clipboard
     unzip
     unrar
-    vim
   ];
 }

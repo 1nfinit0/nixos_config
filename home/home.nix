@@ -12,6 +12,7 @@
 		./apps/rofi/rofi.nix
 		./apps/kitty/kitty.nix
 		./apps/vscode/vscode.nix
+		./apps/neovim/neovim.nix
 		./apps/latex/latex.nix
 		./apps/wine/wine.nix
 
