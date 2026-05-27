@@ -23,5 +23,7 @@
     ./osd.nix
     ./monitor.nix
     ./wallpaper.nix
+    ./dunst.nix
+    ./battery.nix
   ];
 }

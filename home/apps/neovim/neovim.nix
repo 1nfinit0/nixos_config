@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 {
   programs.neovim = {
+    withRuby = false;
+    withPython3 = false;
     enable = true;
     defaultEditor = true;
     viAlias = true;
@@ -8,8 +10,8 @@
 
     extraPackages = with pkgs; [
       # LSP servers
-      nodePackages.pyright          # Python
-      nodePackages.typescript-language-server  # JS/TS
+      pyright
+      typescript-language-server
       jdt-language-server           # Java
       lua-language-server
       nil                           # Nix
