@@ -46,7 +46,7 @@
       nvim-web-devicons
     ];
 
-    extraLuaConfig = ''
+    initLua = ''
       -- tema
       require("tokyonight").setup({ style = "night", transparent = false })
       vim.cmd("colorscheme tokyonight")
@@ -94,28 +94,63 @@
       })
 
       -- LSP
-      local lsp = require("lspconfig")
-      local caps = require("cmp_nvim_lsp").default_capabilities()
+local caps =
+  require("cmp_nvim_lsp")
+    .default_capabilities()
 
-      lsp.pyright.setup({ capabilities = caps })
-      lsp.tsserver.setup({ capabilities = caps })
-      lsp.jdtls.setup({ capabilities = caps })
-      lsp.lua_ls.setup({ capabilities = caps })
-      lsp.nil_ls.setup({ capabilities = caps })
+vim.lsp.config("pyright", {
+  capabilities = caps,
+})
 
-      -- keymaps LSP
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(ev)
-          local opts = { buffer = ev.buf }
-          map("n", "gd",         vim.lsp.buf.definition,     opts)
-          map("n", "K",          vim.lsp.buf.hover,          opts)
-          map("n", "<leader>rn", vim.lsp.buf.rename,         opts)
-          map("n", "<leader>ca", vim.lsp.buf.code_action,    opts)
-          map("n", "<leader>d",  vim.diagnostic.open_float,  opts)
-          map("n", "[d",         vim.diagnostic.goto_prev,   opts)
-          map("n", "]d",         vim.diagnostic.goto_next,   opts)
-        end,
-      })
+vim.lsp.config("ts_ls", {
+  capabilities = caps,
+})
+
+vim.lsp.config("jdtls", {
+  capabilities = caps,
+})
+
+vim.lsp.config("lua_ls", {
+  capabilities = caps,
+})
+
+vim.lsp.config("nil_ls", {
+  capabilities = caps,
+})
+
+vim.lsp.enable("pyright")
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("jdtls")
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("nil_ls")
+
+-- keymaps LSP
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(ev)
+    local opts = { buffer = ev.buf }
+
+    map("n", "gd",
+      vim.lsp.buf.definition, opts)
+
+    map("n", "K",
+      vim.lsp.buf.hover, opts)
+
+    map("n", "<leader>rn",
+      vim.lsp.buf.rename, opts)
+
+    map("n", "<leader>ca",
+      vim.lsp.buf.code_action, opts)
+
+    map("n", "<leader>d",
+      vim.diagnostic.open_float, opts)
+
+    map("n", "[d",
+      vim.diagnostic.goto_prev, opts)
+
+    map("n", "]d",
+      vim.diagnostic.goto_next, opts)
+  end,
+})
 
       -- navegación ventanas
       map("n", "<leader>h", "<C-w>h")
