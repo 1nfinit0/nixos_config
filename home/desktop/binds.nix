@@ -54,9 +54,9 @@
     "SUPER SHIFT, down, swapwindow, d"
 
     # resize de ventanas (CTRL + SUPER + flechas)
-    "SUPER CTRL, left, resizeactive, -40 0"
-    "SUPER CTRL, right, resizeactive, 40 0"
-    "SUPER CTRL, up, resizeactive, 0 -40"
-    "SUPER CTRL, down, resizeactive, 0 40"
+    "SUPER CTRL, left, resizeactive, -50 0"
+    "SUPER CTRL, right, resizeactive, 50 0"
+    "SUPER CTRL, up, resizeactive, 0 -50"
+    "SUPER CTRL, down, resizeactive, 0 50"
   ];
 }
