@@ -14,6 +14,7 @@
     ", XF86AudioMute,        exec, swayosd-client --output-volume mute-toggle"
     ", XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
     ", XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
+    "SUPER, F9, exec, mic-toggle"
 
     # Brillo osd
     ", XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
