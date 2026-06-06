@@ -24,7 +24,10 @@
         hyperref
         tocbibind
         # Utilidades
-        latexmk;
+        latexmk
+	microtype
+	xurl
+	enumitem;
     })
   ];
 
