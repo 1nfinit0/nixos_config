@@ -2,6 +2,7 @@
 {
   home.packages = with pkgs; [
     texlab
+    pandoc
     (texlive.combine {
       inherit (texlive)
         scheme-medium
