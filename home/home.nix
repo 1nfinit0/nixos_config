@@ -15,8 +15,7 @@
 		./apps/neovim/neovim.nix
 		./apps/latex/latex.nix
 		./apps/wine/wine.nix
-                ./apps/qgis/qgis.nix
-		./apps/zoom/zoom.nix
+    ./apps/qgis/qgis.nix
 
 		./desktop/hyprland.nix
 
