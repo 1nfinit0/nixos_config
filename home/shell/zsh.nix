@@ -31,7 +31,7 @@
     # Aliases (incluye los tuyos)
     # -------------------------
     shellAliases = {
-      l = "eza --icons";
+      l = "eza -h --icons";
       ll = "eza -lh --icons --sort=modified";
       la = "eza -lah --icons --sort=modified";
       lt = "eza --tree";

@@ -1,6 +1,22 @@
 { config, pkgs, ... }:
 
+let
+  cycleLayout = pkgs.writeShellScriptBin "hyprland-cycle-layout" ''
+    state_file="/tmp/hyprland-layout-mode"
+    current_layout="$(cat "$state_file" 2>/dev/null || echo master)"
+
+    if [ "$current_layout" = "master" ]; then
+      hyprctl keyword general:layout dwindle
+      printf '%s\n' dwindle > "$state_file"
+    else
+      hyprctl keyword general:layout master
+      printf '%s\n' master > "$state_file"
+    fi
+  '';
+in
 {
+  home.packages = [ cycleLayout ];
+
   wayland.windowManager.hyprland.settings.bind = [
     # apps básicas
     "SUPER, RETURN, exec, kitty"
@@ -28,6 +44,9 @@
 
     # cerrar ventana activa
     "SUPER, Q, killactive"
+
+    # reorganiza el workspace activo alternando entre master y dwindle
+    "SUPER, SPACE, exec, hyprland-cycle-layout"
 
     # mover foco entre ventanas
     "SUPER, left, movefocus, l"
