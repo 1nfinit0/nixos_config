@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-	
+
 	home.sessionVariables = {
     		MAMBA_ROOT_PREFIX = "$HOME/.local/share/micromamba";
 	};
@@ -31,7 +31,7 @@
     # Aliases (incluye los tuyos)
     # -------------------------
     shellAliases = {
-      l = "eza -h --icons";
+      l = "eza -lh --icons --sort=modified --no-permissions --no-user --no-filesize";
       ll = "eza -lh --icons --sort=modified";
       la = "eza -lah --icons --sort=modified";
       lt = "eza --tree";
