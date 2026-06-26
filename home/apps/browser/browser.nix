@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
-
 {
   home.packages = with pkgs; [
-    brave
+    (brave.override {
+      commandLineArgs = "--disable-pinch";
+    })
   ];
 }
