@@ -42,6 +42,7 @@
         clock = {
           format = "{:%H:%M  %d/%m}";
           tooltip-format = "{:%A, %d de %B de %Y}";
+          on-click = "kitty --class calendar-popup -e sh -c 'cal -3; read -n 1'";
         };
 
         network = {
