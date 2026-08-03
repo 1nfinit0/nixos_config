@@ -16,6 +16,7 @@
         # Gráficos
         pgf
         pgfplots
+        tcolorbox
         # Estilo / formato
         fancyhdr
         titlesec
