@@ -1,8 +1,8 @@
 { pkgs, ... }:
 {
-  nixpkgs.config.allowUnfree = true;
-
-  home.packages = with pkgs; [
-    ciscoPacketTracer9
+  home.packages = [
+    (pkgs.ciscoPacketTracer9.override {
+      packetTracerSource = ../../../assets/cisco-packet-tracer/CiscoPacketTracer_901_Ubuntu_64bit.deb;
+    })
   ];
 }

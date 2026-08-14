@@ -10,13 +10,12 @@
     ../../modules/user/user.nix
     ../../modules/user/shell.nix
   ];
-
   # Hostname
   networking.hostName = "nixos";
-
+  # Unfree packages (ej. Cisco Packet Tracer)
+  nixpkgs.config.allowUnfree = true;
   # Keyring
   security.pam.services.login.enableGnomeKeyring = true;
-
   # PostgreSQL
   services.postgresql = {
     enable = true;
@@ -33,14 +32,12 @@
       host  all all ::1/128      trust
     '';
   };
-
   # Hyprland
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
     withUWSM = true;
   };
-
   # Logind
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";
@@ -48,6 +45,5 @@
     HandlePowerKey = "ignore";
     HandlePowerKeyLongPress = "ignore";
   };
-
   system.stateVersion = "25.11";
 }
