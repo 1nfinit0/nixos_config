@@ -17,6 +17,7 @@
         pgf
         pgfplots
         tcolorbox
+	tikzfill
         # Estilo / formato
         fancyhdr
         titlesec
@@ -29,6 +30,9 @@
         latexmk
 	microtype
 	xurl
+	pdfcol
+	listingsutf8
+	sectsty
 	enumitem;
     })
   ];

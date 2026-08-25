@@ -13,6 +13,7 @@
     ripgrep
     fzf
     zoxide
+    glow
 
     # -----------------------------
     # NETWORKING
