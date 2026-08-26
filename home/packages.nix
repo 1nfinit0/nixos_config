@@ -14,6 +14,7 @@
     fzf
     zoxide
     glow
+    btop
 
     # -----------------------------
     # NETWORKING

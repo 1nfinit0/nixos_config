@@ -18,7 +18,7 @@
   security.pam.services.login.enableGnomeKeyring = true;
   # PostgreSQL
   services.postgresql = {
-    enable = true;
+    enable = false;
     ensureDatabases = [ "tobi" ];
     ensureUsers = [
       {
