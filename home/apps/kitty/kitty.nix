@@ -6,7 +6,7 @@
 
     font = {
       name = "Hack Nerd Font Mono";
-      size = 13;
+      size = 14;
     };
 
     settings = {

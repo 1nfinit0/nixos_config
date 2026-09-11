@@ -7,6 +7,7 @@
 		./development/netbeans/netbeans.nix
 		./development/pgadmin/pgadmin.nix
 		./development/node/node.nix
+		./development/copilot/copilot.nix
 
 		./apps/browser/browser.nix
 		./apps/rofi/rofi.nix
