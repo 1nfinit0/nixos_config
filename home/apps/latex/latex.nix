@@ -3,7 +3,7 @@
   home.packages = with pkgs; [
     texlab
     pandoc
-    (texlive.combine {
+    (texliveSmall.withPackages {
       inherit (texlive)
         scheme-medium
         # Idioma
