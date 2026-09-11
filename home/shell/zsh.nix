@@ -115,6 +115,18 @@
           eval "$(command micromamba shell hook --shell zsh)"
           micromamba "$@"
         }
+
+        mv() {
+          local dest="''${@[-1]}"
+          local -a sources=()
+
+          for arg in "''${@:1:-1}"; do
+            [[ "$arg:A" == "$dest:A" ]] && continue
+            sources+=("$arg")
+          done
+
+          command mv "''${sources[@]}" "$dest"
+          }
       '')
     ];
   };

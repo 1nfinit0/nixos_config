@@ -17,7 +17,7 @@
         pgf
         pgfplots
         tcolorbox
-	tikzfill
+      	tikzfill
         # Estilo / formato
         fancyhdr
         titlesec
@@ -28,12 +28,16 @@
         tocbibind
         # Utilidades
         latexmk
-	microtype
-	xurl
-	pdfcol
-	listingsutf8
-	sectsty
-	enumitem;
+      	microtype
+	      xurl
+	      pdfcol
+	      listingsutf8
+	      sectsty
+	      enumitem
+        fontawesome5
+        changepage
+        minted
+        upquote;
     })
   ];
 
