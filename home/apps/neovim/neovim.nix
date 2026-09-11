@@ -35,10 +35,6 @@
       luasnip
       cmp_luasnip
 
-      # copilot
-      copilot-lua
-      copilot-cmp
-
       # ui
       telescope-nvim
       nvim-tree-lua
