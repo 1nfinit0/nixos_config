@@ -49,24 +49,51 @@
 
       -- opciones básicas
       vim.opt.number = true
-      vim.opt.relativenumber = true
+      vim.opt.relativenumber = false
+      vim.opt.numberwidth = 2
       vim.opt.tabstop = 2
       vim.opt.shiftwidth = 2
       vim.opt.expandtab = true
       vim.opt.termguicolors = true
+      vim.opt.cursorline = false
+      vim.opt.guicursor = "n-v-c:ver25,i-ci-ve:ver25,r-cr:hor20,o:hor50"
+      vim.opt.clipboard = "unnamedplus"
 
       -- leader
       vim.g.mapleader = " "
       local map = vim.keymap.set
 
-      -- copilot
-      require("copilot").setup({
-        suggestion = { enabled = false },
-        panel = { enabled = false },
-      })
-      require("copilot_cmp").setup()
+      local function visual_move(motion)
+        return function()
+          vim.cmd("normal! v")
+          vim.cmd("normal! " .. motion)
+        end
+      end
+
+      map("n", "<S-left>",  visual_move("h"))
+      map("n", "<S-right>", visual_move("l"))
+      map("n", "<S-up>",    visual_move("k"))
+      map("n", "<S-down>",  visual_move("j"))
+
+      map("v", "<S-left>",  "h")
+      map("v", "<S-right>", "l")
+      map("v", "<S-up>",    "k")
+      map("v", "<S-down>",  "j")
+
+      map("v", "<Left>",  '<Esc>h')
+      map("v", "<Right>", '<Esc>l')
+      map("v", "<Up>",    '<Esc>k')
+      map("v", "<Down>",  '<Esc>j')
+
+      map("v", "d", '"+d')
+      map("v", "x", '"+d')
+      map("v", "y", '"+y')
+      map("v", "<C-c>", '"+y')
+      map("n", "<C-v>", '"+p')
+      map("i", "<C-v>", '<Esc>"+pi')
 
       -- autocompletado
+
       local cmp = require("cmp")
       local luasnip = require("luasnip")
 
@@ -81,7 +108,6 @@
           ["<C-Space>"] = cmp.mapping.complete(),
         }),
         sources = cmp.config.sources({
-          { name = "copilot" },
           { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "buffer" },
@@ -169,8 +195,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
       -- árbol de archivos
       local ok2, _ = pcall(require, "nvim-tree")
       if ok2 then
+        local api = require("nvim-tree.api")
+
+        local function toggle_tree_with_focus()
+          if api.tree.is_visible() then
+            api.tree.close()
+            vim.cmd("wincmd p")
+          else
+            api.tree.open()
+            api.tree.focus()
+          end
+        end
+
         require("nvim-tree").setup()
-        map("n", "<leader>e", ":NvimTreeToggle<CR>")
+        map({ "n", "i" }, "<C-b>", toggle_tree_with_focus)
       end
 
       -- lualine
