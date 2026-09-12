@@ -2,16 +2,64 @@
 
 let
   cycleLayout = pkgs.writeShellScriptBin "hyprland-cycle-layout" ''
-    state_file="/tmp/hyprland-layout-mode"
-    current_layout="$(cat "$state_file" 2>/dev/null || echo master)"
+    state_file="/tmp/hyprland-layout-state"
+    current_step="$(cat "$state_file" 2>/dev/null || echo 0)"
+    active_windows="$(hyprctl activeworkspace -j | sed -nE 's/.*"windows"[[:space:]]*:[[:space:]]*([0-9]+).*/\1/p' | head -n 1)"
 
-    if [ "$current_layout" = "master" ]; then
-      hyprctl keyword general:layout dwindle
-      printf '%s\n' dwindle > "$state_file"
-    else
-      hyprctl keyword general:layout master
-      printf '%s\n' master > "$state_file"
-    fi
+    case "$active_windows" in
+      ""|"0"|"1")
+        exit 0
+        ;;
+      "2")
+        total_steps=2
+        ;;
+      "3")
+        total_steps=3
+        ;;
+      *)
+        total_steps=2
+        ;;
+    esac
+
+    next_step=$(( (current_step + 1) % total_steps ))
+    printf '%s\n' "$next_step" > "$state_file"
+
+    hyprctl keyword general:layout master
+
+    case "$active_windows" in
+      "2")
+        if [ "$next_step" -eq 0 ]; then
+          hyprctl dispatch layoutmsg orientationleft
+        else
+          hyprctl dispatch layoutmsg orientationtop
+        fi
+        ;;
+      "3")
+        case "$next_step" in
+          0)
+            hyprctl dispatch layoutmsg orientationleft
+            hyprctl dispatch layoutmsg removemaster
+            hyprctl dispatch layoutmsg removemaster
+            ;;
+          1)
+            hyprctl dispatch layoutmsg orientationtop
+            hyprctl dispatch layoutmsg removemaster
+            hyprctl dispatch layoutmsg removemaster
+            ;;
+          2)
+            hyprctl dispatch layoutmsg orientationleft
+            hyprctl dispatch layoutmsg addmaster
+            ;;
+        esac
+        ;;
+      *)
+        if [ "$next_step" -eq 0 ]; then
+          hyprctl dispatch layoutmsg orientationleft
+        else
+          hyprctl dispatch layoutmsg orientationtop
+        fi
+        ;;
+    esac
   '';
 in
 {
@@ -45,7 +93,7 @@ in
     # cerrar ventana activa
     "SUPER, Q, killactive"
 
-    # reorganiza el workspace activo alternando entre master y dwindle
+    # cambia la disposición del workspace según el número de ventanas
     "SUPER, SPACE, exec, hyprland-cycle-layout"
 
     # mover foco entre ventanas
