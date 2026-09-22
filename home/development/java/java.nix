@@ -2,6 +2,10 @@
 {
   home.packages = with pkgs; [
     jdk
+    ant
+
+    (writeShellScriptBin "create-java-ant"
+      (builtins.readFile ./create-java-ant.sh))
   ];
 
   home.sessionVariables = {
