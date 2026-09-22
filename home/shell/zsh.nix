@@ -127,6 +127,13 @@
 
           command mv "''${sources[@]}" "$dest"
           }
+        
+        
+        jrun() {
+          javac -d . $(find . -name "*.java") && java "$1" && find . -name "*.class" 
+          -delete
+        }
+
       '')
     ];
   };

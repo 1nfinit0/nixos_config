@@ -18,6 +18,8 @@
     ];
 
     plugins = with pkgs.vimPlugins; [
+      copilot-vim
+      
       # tema
       tokyonight-nvim
 
