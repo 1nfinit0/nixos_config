@@ -130,9 +130,40 @@
         
         
         jrun() {
-          javac -d . $(find . -name "*.java") && java "$1" && find . -name "*.class" 
-          -delete
-        }
+          if [[ -z "$1" ]]; then
+            echo "Uso: jrun <ClasePrincipal> [argumentos...]"
+            return 1
+          fi
+
+          local main="$1"
+          shift
+
+          # Aceptar tanto "Main" como "src/Main.java"
+          main="''${main##*/}"
+          main="''${main%.java}"
+
+          local tmpdir
+          tmpdir=$(mktemp -d)
+
+          echo "Compilando..."
+
+          if ! javac -d "$tmpdir" $(find . -name "*.java" -type f); then
+            rm -rf "$tmpdir"
+            echo "Error de compilación."
+            return 1
+          fi
+
+          echo
+          echo "Ejecutando $main..."
+          echo
+
+          java -cp "$tmpdir" "$main" "$@"
+          local status=$?
+
+          rm -rf "$tmpdir"
+
+          return $status
+        }       
 
       '')
     ];
