@@ -130,40 +130,75 @@
         
         
         jrun() {
-          if [[ -z "$1" ]]; then
-            echo "Uso: jrun <ClasePrincipal> [argumentos...]"
-            return 1
-          fi
+  if [[ -z "$1" ]]; then
+    echo "Uso: jrun <ClasePrincipal.java|ClasePrincipal> [argumentos...]"
+    return 1
+  fi
 
-          local main="$1"
-          shift
+  local target="$1"
+  shift
 
-          # Aceptar tanto "Main" como "src/Main.java"
-          main="''${main##*/}"
-          main="''${main%.java}"
+  local source=""
+  local main=""
+  local package=""
+  local fqcn=""
 
-          local tmpdir
-          tmpdir=$(mktemp -d)
+  # Si se pasó un archivo .java
+  if [[ "$target" == *.java ]]; then
+    source="$target"
 
-          echo "Compilando..."
+    if [[ ! -f "$source" ]]; then
+      echo "No existe: $source"
+      return 1
+    fi
 
-          if ! javac -d "$tmpdir" $(find . -name "*.java" -type f); then
-            rm -rf "$tmpdir"
-            echo "Error de compilación."
-            return 1
-          fi
+    main="''${target##*/}"
+    main="''${main%.java}"
 
-          echo
-          echo "Ejecutando $main..."
-          echo
+  else
+    # Buscar la clase dentro del proyecto
+    main="$target"
+    source=$(find . -name "$main.java" -type f | head -n 1)
 
-          java -cp "$tmpdir" "$main" "$@"
-          local status=$?
+    if [[ -z "$source" ]]; then
+      echo "No se encontró $main.java"
+      return 1
+    fi
+  fi
 
-          rm -rf "$tmpdir"
+  # Detectar automáticamente el package
+  package=$(sed -n \
+    's/^[[:space:]]*package[[:space:]]\+\([^;]*\);.*$/\1/p' \
+    "$source" | head -n 1)
 
-          return $status
-        }       
+  if [[ -n "$package" ]]; then
+    fqcn="$package.$main"
+  else
+    fqcn="$main"
+  fi
+
+  local tmpdir
+  tmpdir=$(mktemp -d)
+
+  echo "Compilando..."
+
+  if ! javac -d "$tmpdir" $(find . -name "*.java" -type f); then
+    rm -rf "$tmpdir"
+    echo "Error de compilación."
+    return 1
+  fi
+
+  echo
+  echo "Ejecutando $fqcn..."
+  echo
+
+  java -cp "$tmpdir" "$fqcn" "$@"
+  local exit_code=$?
+
+  rm -rf "$tmpdir"
+
+  return $exit_code
+}
 
       '')
     ];
