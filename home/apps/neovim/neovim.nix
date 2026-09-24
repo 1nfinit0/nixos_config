@@ -527,13 +527,6 @@
             }
           end
 
-          vim.notify(
-            "jdtls -> root: " .. root_dir
-              .. " | workspace: " .. workspace_dir
-              .. " | unmanaged: " .. tostring(not has_build_tool),
-            vim.log.levels.INFO
-          )
-
           jdtls.start_or_attach({
             cmd = { "jdtls", "-data", workspace_dir },
             root_dir = root_dir,
