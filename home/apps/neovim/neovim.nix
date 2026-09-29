@@ -65,6 +65,20 @@
       vim.opt.scrolloff = 0
       vim.opt.sidescrolloff = 0
 
+      -- algunos ftplugin/indent que trae Neovim (el de Java, por
+      -- ejemplo) fijan su propio shiftwidth/tabstop apenas detectan el
+      -- filetype (Java: 4 por defecto), pisando lo de arriba. Esto lo
+      -- regresa a tu preferencia de 2 espacios sin importar el lenguaje.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "*",
+        callback = function()
+          vim.bo.tabstop = 2
+          vim.bo.shiftwidth = 2
+          vim.bo.softtabstop = 2
+          vim.bo.expandtab = true
+        end,
+      })
+
       vim.diagnostic.config({
         virtual_text = {
           spacing = 2,
@@ -604,6 +618,13 @@
           view = {
             side = "right",
             width = 35,
+          },
+          actions = {
+            open_file = {
+              -- al escoger un archivo (Enter/o), el árbol se cierra solo;
+              -- <C-b> lo vuelve a abrir cuando lo necesites
+              quit_on_open = true,
+            },
           },
           on_attach = function(bufnr)
             -- Mapeos por defecto de nvim-tree (todos en modo Normal):
