@@ -41,6 +41,7 @@
       # ui
       telescope-nvim
       nvim-tree-lua
+      dressing-nvim
       lualine-nvim
       nvim-web-devicons
     ];
@@ -119,21 +120,28 @@
       -- Comportamiento "tipo VSCode"
       -- ==========================================================
       -- 1) Siempre se abre en modo insert (autocmd más abajo).
-      -- 2) Shift+flecha entra a Visual y extiende la selección.
-      -- 3) La terminal no puede detectar "soltar Shift" (no hay
-      --    evento de key-up para modificadores), así que se usa la
-      --    flecha SIN shift como señal de "ya solté shift": si estás
-      --    en Visual y presionas una flecha normal, se cancela la
-      --    selección y vuelves a insert en la nueva posición.
-      -- 4) Si por algún motivo terminas en Normal (Esc manual, :w,
-      --    una acción de LSP, etc.), una flecha normal también te
-      --    mueve y te regresa a insert, para que Normal nunca quede
-      --    "pegado" sin que lo pidas explícitamente con un comando.
+      -- 2) Shift+flecha entra a Visual y extiende la selección; con
+      --    Ctrl selecciona por palabra, con Ctrl+Home/End selecciona
+      --    hasta el inicio/fin del documento.
+      -- 3) La terminal no puede detectar "soltar Shift" (no hay evento
+      --    de key-up para modificadores), así que se usa la misma
+      --    combinación SIN shift como señal de "ya solté shift": si
+      --    estás en Visual y la presionas, se colapsa la selección
+      --    donde estaba (sin mover más) y vuelves a insert ahí mismo.
+      -- 4) Fuera de una selección, esas mismas combinaciones sin shift
+      --    simplemente mueven el cursor (por carácter, palabra, o al
+      --    inicio/fin del documento) y, si quedaste en Normal por algún
+      --    motivo (Esc manual, :w, una acción de LSP), regresan a
+      --    insert -- Normal nunca queda "pegado" sin pedirlo tú.
 
       local function visual_move(motion)
+        -- :normal! NO traduce notaciones como <C-f> por sí solo (a
+        -- diferencia de un mapeo normal); hay que traducirlas primero
+        -- a los bytes reales para que motions con Ctrl funcionen aquí.
+        local keys = vim.api.nvim_replace_termcodes(motion, true, false, true)
         return function()
           vim.cmd("normal! v")
-          vim.cmd("normal! " .. motion)
+          vim.cmd("normal! " .. keys)
         end
       end
 
@@ -141,49 +149,137 @@
         return function()
           vim.cmd("normal! " .. motion)
           -- solo "editar" si el buffer actual es realmente editable
-          -- (en nvim-tree, quickfix, etc. la flecha debe quedarse como
-          -- simple movimiento, sin forzar insert)
+          -- (en nvim-tree, quickfix, etc. la combinación debe quedarse
+          -- como simple movimiento, sin forzar insert)
           if is_editable_buffer(0) then
             vim.cmd("startinsert")
           end
         end
       end
 
-      -- Normal -> Visual (inicia selección)
-      map("n", "<S-Left>",  visual_move("h"))
-      map("n", "<S-Right>", visual_move("l"))
-      map("n", "<S-Up>",    visual_move("k"))
-      map("n", "<S-Down>",  visual_move("j"))
+      -- Selección por unidad: carácter (Shift+flecha), palabra
+      -- (Ctrl+Shift+izq/der) y documento completo (Ctrl+Shift+Home/End).
+      --
+      -- Sobre el "+1 carácter de más" al entrar desde Insert: al salir
+      -- de Insert, Neovim retrocede el cursor una columna (así funciona
+      -- <Esc> siempre que no estés en la columna 0). Para una selección
+      -- hacia la IZQUIERDA eso cae justo donde debía empezar. Para una
+      -- hacia la DERECHA hay que compensar ese retroceso con una "l" de
+      -- más ANTES de entrar a Visual -- si no, la selección arranca
+      -- incluyendo el carácter que ya habías escrito (el bug reportado).
+      -- Para un solo carácter (h/l) ese único paso ya lo da <Esc> (o la
+      -- "l" de compensación), así que no se repite con la motion; para
+      -- palabra/documento (b/w, gg/G) sí se aplica la motion completa.
+      local selection_units = {
+        {
+          keys  = { left = { "<S-Left>" },   right = { "<S-Right>" } },
+          left  = { motion = "h", atomic = true },
+          right = { motion = "l", atomic = true },
+        },
+        {
+          -- <C-S-...> por si algún día liberas esa combinación en la
+          -- terminal/Hyprland; <M-S-...> (Alt+Shift) como respaldo que
+          -- casi nunca está tomado por el WM ni la terminal.
+          keys  = { left = { "<C-S-Left>", "<M-S-Left>" }, right = { "<C-S-Right>", "<M-S-Right>" } },
+          left  = { motion = "b" },
+          right = { motion = "w" },
+        },
+        {
+          keys  = { left = { "<C-S-Home>" }, right = { "<C-S-End>" } },
+          left  = { motion = "gg" },
+          right = { motion = "G" },
+        },
+      }
 
-      -- Insert -> Visual (inicia selección mientras escribes).
-      -- Importante: SIN expr = true. El rhs ya es la secuencia de teclas
-      -- literal a enviar ("<Esc>" + "v" + motion). Si se marca
-      -- expr = true, Neovim intenta *evaluar* ese texto como una
-      -- expresión de Vimscript en vez de enviarlo como teclas, y truena
-      -- con "E15: Invalid expression: ..." -- ese era el bug.
-      map("i", "<S-Left>",  "<Esc>vh")
-      map("i", "<S-Right>", "<Esc>vl")
-      map("i", "<S-Up>",    "<Esc>vk")
-      map("i", "<S-Down>",  "<Esc>vj")
+      for _, unit in ipairs(selection_units) do
+        for _, side in ipairs({ "left", "right" }) do
+          local motion = unit[side].motion
+          local atomic = unit[side].atomic
 
-      -- Visual: seguir extendiendo mientras "sigues con shift"
-      map("v", "<S-Left>",  "h")
-      map("v", "<S-Right>", "l")
-      map("v", "<S-Up>",    "k")
-      map("v", "<S-Down>",  "j")
+          -- Insert -> Visual (ver la nota de arriba). Importante: SIN
+          -- expr = true. El rhs ya es la secuencia de teclas literal;
+          -- con expr = true Neovim la evaluaría como Vimscript y truena
+          -- con "E15: Invalid expression".
+          local insert_rhs
+          if side == "left" then
+            insert_rhs = atomic and "<Esc>v" or ("<Esc>v" .. motion)
+          else
+            insert_rhs = atomic and "<Esc>lv" or ("<Esc>lv" .. motion)
+          end
 
-      -- Visual -> Insert ("soltaste shift": cancela selección y sigue
-      -- editando). Mismo motivo que arriba: nada de expr = true aquí.
-      map("v", "<Left>",  "<Esc>i")
-      map("v", "<Right>", "<Esc>i")
-      map("v", "<Up>",    "<Esc>i")
-      map("v", "<Down>",  "<Esc>i")
+          for _, key in ipairs(unit.keys[side]) do
+            -- Normal -> Visual: el cursor ya está sobre un carácter
+            -- real, sin el desfase de Insert, así que siempre v + motion.
+            map("n", key, visual_move(motion))
+            map("i", key, insert_rhs)
+            -- Visual: seguir extendiendo mientras "sigues con shift"
+            map("v", key, motion)
+          end
+        end
+      end
 
-      -- Normal -> Insert (si quedaste en Normal, una flecha te regresa a editar)
+      -- Arriba/abajo (línea) y Shift+Fn+flecha (página visible, lo
+      -- típico): el desfase de columna que deja <Esc> es perpendicular
+      -- al eje vertical, así que aquí SIEMPRE hace falta la compensación
+      -- de "l" (a diferencia de horizontal, donde solo hacía falta para
+      -- un lado) -- si no, la selección arranca en la columna de un
+      -- carácter antes del cursor real, en vez de la columna exacta.
+      -- <C-b>/<C-f> son los motions de Vim para retroceder/avanzar una
+      -- pantalla completa.
+      local vertical_selection = {
+        ["<S-Up>"] = "k", ["<S-Down>"] = "j",
+        ["<S-PageUp>"] = "<C-b>", ["<S-PageDown>"] = "<C-f>",
+      }
+      for key, motion in pairs(vertical_selection) do
+        map("n", key, visual_move(motion))
+        map("i", key, "<Esc>lv" .. motion)
+        map("v", key, motion)
+      end
+
+      -- Visual -> Insert ("soltaste shift" en cualquiera de las
+      -- combinaciones de arriba): colapsa la selección donde estaba
+      -- -- sin mover más -- y sigue editando ahí. Mismo motivo que
+      -- arriba: nada de expr = true aquí.
+      for _, key in ipairs({
+        "<Left>", "<Right>", "<Up>", "<Down>",
+        "<C-Left>", "<C-Right>", "<C-Home>", "<C-End>",
+        "<PageUp>", "<PageDown>",
+      }) do
+        map("v", key, "<Esc>i")
+      end
+
+      -- Flechas solas (sin shift, sin selección activa): si quedaste
+      -- en Normal, mueven y regresan a insert.
       map("n", "<Left>",  move_and_insert("h"))
       map("n", "<Right>", move_and_insert("l"))
       map("n", "<Up>",    move_and_insert("k"))
       map("n", "<Down>",  move_and_insert("j"))
+
+      -- Ctrl+flecha / Ctrl+Home / Ctrl+End sin shift: mismo trato, pero
+      -- moviendo por palabra o al inicio/fin del documento.
+      local plain_ctrl_moves = {
+        ["<C-Left>"] = "b", ["<C-Right>"] = "w",
+        ["<C-Home>"] = "gg", ["<C-End>"] = "G",
+        -- "{"/"}" son los motions nativos de Vim para saltar entre
+        -- bloques separados por una línea en blanco (párrafos de texto,
+        -- bloques de código, lo que sea) -- justo lo que pediste.
+        ["<C-Up>"] = "{", ["<C-Down>"] = "}",
+      }
+
+      for key, motion in pairs(plain_ctrl_moves) do
+        map("n", key, move_and_insert(motion))
+        -- <C-o> ejecuta un solo comando de Normal (aquí, el motion
+        -- completo, aunque sea de dos teclas como "gg") y regresa a
+        -- insert sin salir de él.
+        map("i", key, "<C-o>" .. motion)
+      end
+
+      -- En Visual, Ctrl+Arriba/Abajo extiende la selección hasta el
+      -- siguiente/anterior bloque -- a diferencia de Ctrl+flecha/
+      -- Home/End (que cancelan la selección, ver la lista de abajo),
+      -- aquí sí tiene sentido "seleccionar el bloque completo" de un jalón.
+      map("v", "<C-Up>",   "{")
+      map("v", "<C-Down>", "}")
 
       -- desplazamiento de pantalla
       local function scroll_line_up()
@@ -194,20 +290,13 @@
         vim.cmd("normal! <C-e>")
       end
 
-      map("n", "<C-Up>",   scroll_line_up,   { silent = true })
-      map("n", "<C-Down>", scroll_line_down, { silent = true })
+      -- <C-Up>/<C-Down> ahora son navegación por bloques (ver
+      -- plain_ctrl_moves más arriba); el scroll de pantalla se queda
+      -- solo en <C-k>/<C-j>.
       map("n", "<C-k>",    scroll_line_up,   { silent = true })
       map("n", "<C-j>",    scroll_line_down, { silent = true })
-      map("v", "<C-Up>",   scroll_line_up,   { silent = true })
-      map("v", "<C-Down>", scroll_line_down, { silent = true })
       map("v", "<C-k>",    scroll_line_up,   { silent = true })
       map("v", "<C-j>",    scroll_line_down, { silent = true })
-      map("i", "<C-Up>", function()
-        return vim.api.nvim_replace_termcodes("<C-o><C-y>", true, false, true)
-      end, { expr = true })
-      map("i", "<C-Down>", function()
-        return vim.api.nvim_replace_termcodes("<C-o><C-e>", true, false, true)
-      end, { expr = true })
       map("i", "<C-k>", function()
         return vim.api.nvim_replace_termcodes("<C-o><C-y>", true, false, true)
       end, { expr = true })
@@ -234,8 +323,8 @@
 
       map("n", "<PageUp>",   page_up_or_top,      { expr = true })
       map("n", "<PageDown>", page_down_or_bottom, { expr = true })
-      map("v", "<PageUp>",   "<C-b>")
-      map("v", "<PageDown>", "<C-f>")
+      -- (el Visual->Insert de <PageUp>/<PageDown> ya quedó cubierto
+      -- arriba, junto con el resto de teclas que "cancelan" selección)
       map("i", "<PageUp>", function()
         if vim.fn.line(".") <= vim.fn.winheight(0) then
           return vim.api.nvim_replace_termcodes("<C-o>gg", true, false, true)
@@ -425,9 +514,45 @@
       -- bien el mapeo.
       map({ "n", "v", "i", "t" }, "<C-lt>", toggle_terminal, { silent = true })
 
+      -- Seleccionar todo (Normal e Insert)
+      map("n", "<C-a>", "ggVG", { silent = true, desc = "Seleccionar todo" })
+      map("i", "<C-a>", "<Esc>ggVG", { silent = true, desc = "Seleccionar todo" })
+
+      -- Navegación entre pestañas.
+      -- Kitty debe enviar secuencias CSI-u distintas para Ctrl+Tab y
+      -- Ctrl+Shift+Tab; los terminales clásicos suelen colapsarlas a Tab.
+      local ctrl_tab = "\27[9;5u"
+      local ctrl_shift_tab = "\27[9;6u"
+      
+      map({ "n", "i", "v" }, ctrl_tab, "<cmd>tabnext<CR>", {
+        silent = true,
+        desc = "Pestaña siguiente",
+      })
+
+      map({ "n", "i", "v" }, ctrl_shift_tab, "<cmd>tabprevious<CR>", {
+        silent = true,
+        desc = "Pestaña anterior",
+      })
+
+      -- Respaldo con la notación estándar: si Neovim SÍ traduce el
+      -- protocolo extendido de kitty a <C-Tab>/<C-S-Tab> en vez de
+      -- darte el byte crudo de arriba, esto cubre ese caso también
+      -- (uno de los dos disparará, no hay conflicto entre ambos).
+      map({ "n", "i", "v" }, "<C-Tab>", "<cmd>tabnext<CR>", {
+        silent = true,
+        desc = "Pestaña siguiente",
+      })
+
+      map({ "n", "i", "v" }, "<C-S-Tab>", "<cmd>tabprevious<CR>", {
+        silent = true,
+        desc = "Pestaña anterior",
+      })
+
       -- portapapeles del sistema
       map("v", "d", '"+d')
       map("v", "x", '"+d')
+      map("v", "<BS>", '"+d')
+      map("v", "<Del>", '"+d')
       map("v", "y", '"+y')
       map("v", "<C-c>", '"+y')
       map("n", "<C-v>", '"+p')
@@ -440,6 +565,9 @@
       local luasnip = require("luasnip")
 
       cmp.setup({
+        completion = {
+          autocomplete = false,
+        },
         snippet = {
           expand = function(args) luasnip.lsp_expand(args.body) end,
         },
@@ -455,6 +583,15 @@
           { name = "buffer" },
           { name = "path" },
         }),
+      })
+
+      -- Menú de selección de Neovim con navegación por flechas.
+      -- dressing.nvim proporciona una interfaz compatible para code actions.
+      require("dressing").setup({
+        select = {
+          enabled = true,
+          backend = { "builtin" },
+        },
       })
 
       -- ==========================================================
@@ -563,6 +700,15 @@
           map("n", "K", vim.lsp.buf.hover, opts)
           map("n", "<leader>rn", vim.lsp.buf.rename, opts)
           map("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+          map({ "n", "v" }, "<leader>cf", function()
+            vim.lsp.buf.format({ async = true })
+          end, opts)
+
+          -- comando con ":" (distinto del <leader>cf de arriba, y del
+          -- ":cf"/":cfile" que ya trae Vim por defecto)
+          vim.api.nvim_create_user_command("Format", function()
+            vim.lsp.buf.format({ async = true })
+          end, {})
 
           map({ "n", "v" }, "<C-.>", vim.lsp.buf.code_action,
             vim.tbl_extend("force", opts, { silent = true, desc = "Code actions" }))
@@ -636,6 +782,13 @@
             -- Sin esto, el árbol no tenía NINGÚN bind propio -- por eso
             -- no había forma de crear archivos.
             api.config.mappings.default_on_attach(bufnr)
+
+            -- Ctrl+Enter abre el archivo en una pestaña nueva.
+            vim.keymap.set("n", "<C-CR>", api.node.open.tab, {
+              buffer = bufnr,
+              silent = true,
+              desc = "Abrir en nueva pestaña",
+            })
 
             -- por si el árbol recibe foco por otra vía (:NvimTreeFocus,
             -- clic, etc.) y no pasa por nuestro toggle_tree_with_focus
