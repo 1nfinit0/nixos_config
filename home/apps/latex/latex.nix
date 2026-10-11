@@ -1,43 +1,12 @@
 { pkgs, ... }:
 {
+   
   home.packages = with pkgs; [
     texlab
     pandoc
-    (texliveSmall.withPackages (ps: with ps; [
-      scheme-medium
-      # Idioma
-      babel-spanish
-      collection-langspanish
-      # Matemáticas
-      amsfonts
-      cancel
-      eulervm
-      # Gráficos
-      pgf
-      pgfplots
-      tcolorbox
-      tikzfill
-      # Estilo / formato
-      fancyhdr
-      titlesec
-      titling
-      tocloft
-      # Referencias
-      hyperref
-      tocbibind
-      # Utilidades
-      latexmk
-      microtype
-      xurl
-      pdfcol
-      listingsutf8
-      sectsty
-      enumitem
-      fontawesome5
-      changepage
-      minted
-      upquote
-    ]))
+    (texlive.combine {
+      inherit (texlive) scheme-full;
+    })
   ];
 
   programs.zathura = {
